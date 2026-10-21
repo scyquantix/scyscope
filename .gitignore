@@ -1,0 +1,9 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+data/**/*.db
+# A base do SICONFI vai no repositório para o app funcionar logo após o clone
+!data/fontes/siconfi.db
+data/**/*.db-*
+.env*

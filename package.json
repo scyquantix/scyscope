@@ -1,0 +1,29 @@
+{
+  "name": "scyscope",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ScyScope, da ScyQuantix: explorador SQL de dados públicos do Brasil (SICONFI, TCE-SP, IBGE, BACEN), um esquema por API",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3100",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 3100",
+    "typecheck": "tsc --noEmit",
+    "sync": "node scripts/sync.mjs"
+  },
+  "dependencies": {
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}
