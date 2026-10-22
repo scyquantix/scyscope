@@ -3,11 +3,13 @@ import Link from "next/link";
 import { esquemas, fontesAusentes } from "@/lib/esquema";
 import { FONTES } from "@/lib/fontes";
 import { bytes, contagem, dataHora } from "@/lib/formato";
+import { exigirUsuario } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Catálogo" };
 export const dynamic = "force-dynamic";
 
-export default function Tabelas() {
+export default async function Tabelas() {
+  await exigirUsuario();
   const lista = esquemas();
   const ausentes = fontesAusentes();
   return (

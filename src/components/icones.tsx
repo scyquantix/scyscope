@@ -45,6 +45,15 @@ export function IconeCatalogo() {
   );
 }
 
+export function IconeSair() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...TRACO}>
+      <path d="M14 4h4.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H14" />
+      <path className="ico-acento" d="M4 12h11M10.5 7.5 15 12l-4.5 4.5" />
+    </svg>
+  );
+}
+
 export function IconeRelatorio() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...TRACO}>
