@@ -5,6 +5,7 @@ import { dados, origem, tabela as buscarTabela, type Tabela } from "@/lib/esquem
 import { fonte } from "@/lib/fontes";
 import { codificar, identificador, literal } from "@/lib/sql";
 import { contagem, numero } from "@/lib/formato";
+import { exigirUsuario } from "@/lib/sessao";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,7 @@ function montar(t: Tabela, sp: Busca) {
 }
 
 export default async function NavegarTabela({ params, searchParams }: Props) {
+  await exigirUsuario();
   const nome = decodeURIComponent((await params).tabela);
   const t = buscarTabela(nome);
   if (!t) notFound();

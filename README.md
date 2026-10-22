@@ -10,7 +10,7 @@ FROM ibge.populacao p
 JOIN bacen.ipca i ON i.mes = p.ano || '-12';
 ```
 
-> **Estado:** MVP em desenvolvimento, com um município, Ferraz de Vasconcelos (SP), código IBGE 3515707.
+> **Estado:** MVP em desenvolvimento, rodando localmente, com um município, Ferraz de Vasconcelos (SP), código IBGE 3515707. Já tem login com usuários locais; o deploy está planejado ([seção Plano de deploy](#plano-de-deploy)), mas ainda não foi feito.
 
 ## Funcionalidades
 
@@ -18,9 +18,19 @@ JOIN bacen.ipca i ON i.mes = p.ano || '-12';
 - Editor com destaque de sintaxe, numeração de linhas e atalhos: `Ctrl+Enter` executa (só a seleção, se houver) e `Ctrl+S` salva.
 - Lateral com o esquema agrupado por fonte. Cada tabela mostra o órgão, uma descrição, a contagem de linhas e as colunas com o tipo, e um clique insere o nome no editor.
 - Dez consultas de exemplo, etiquetadas com as fontes que usam. Várias cruzam esquemas, como receita per capita corrigida pelo IPCA e a conferência entre TCE-SP e SICONFI.
-- Consultas salvas e histórico das execuções, guardados em `data/explorer.db`.
+- Consultas salvas e histórico das execuções, de cada usuário, guardados em `data/explorer.db`.
 - Resultado em três abas: **tabela** (ordenável, com números formatados), **gráfico** (barras ou linhas, com escolha das séries) e **plano de execução** (`EXPLAIN QUERY PLAN`, com varreduras completas destacadas).
 - Exportação CSV de até 200 mil linhas, cópia do resultado e link compartilhável: a URL guarda a consulta (`?q=`).
+
+### Login (`/entrar`)
+- Login e senha, com troca obrigatória da senha inicial no primeiro acesso (`/nova-senha`) e logoff no pé do trilho.
+- Tela no desenho do site da ScyQuantix, com o logo oficial e as cores da marca fixas, iguais nos temas claro e escuro.
+- Botão de olho nos campos de senha, para conferir o que foi digitado.
+- Medidor de força na senha nova: **Incompatível** quando o sistema recusaria a senha (com o motivo), e **Fraca**, **Razoável**, **Boa** ou **Forte** quando ela é aceita. As regras são as mesmas do servidor (`src/lib/regras-senha.ts`), e a comparação com a senha atual é feita no servidor enquanto se digita.
+- Bloqueio do login por 15 minutos depois de 5 tentativas erradas seguidas.
+- Usuários, sessões e registro de acessos em tabelas próprias, com senhas em hash scrypt e regras de RLS emuladas no SQLite. Cada pessoa só vê as próprias consultas salvas e o próprio histórico.
+- Acessos mock do MVP: `leo` e `fabricio`, ambos com a senha inicial `scyscope@2026`.
+- Detalhes, integração futura com o ScyHome e **o que rever antes do deploy**: [`docs/acesso.md`](docs/acesso.md).
 
 ### Catálogo (`/tabelas`)
 - Cada fonte com o tamanho do banco, a data da última atualização e um link para a documentação oficial da API.
@@ -102,7 +112,7 @@ Cada execução substitui o lote numa transação e registra o resultado na tabe
 npm run dev
 ```
 
-Abra **http://127.0.0.1:3100**. A tela inicial já abre com o primeiro exemplo executado.
+Abra **http://127.0.0.1:3100** e entre com `leo` ou `fabricio`, senha `scyscope@2026`. No primeiro acesso, o app pede uma senha nova. Depois disso, a tela de consulta já abre com o primeiro exemplo executado.
 
 **5. (Opcional) Versão de produção**
 
@@ -145,16 +155,58 @@ npm start        # também em http://127.0.0.1:3100
 | `src/lib/config.ts` | Onde fica o arquivo de cada fonte (`data/fontes/<fonte>.db`) e os limites de execução |
 | `src/lib/esquema.ts` | Introspecção por esquema |
 | `src/lib/exemplos.ts` | Consultas de exemplo, sempre com o esquema explícito |
-| `src/app/` | Páginas (Next.js App Router): consulta, catálogo, tabela e relatórios |
-| `src/components/` | Editor, resultado (tabela, gráfico, plano), navegação e marca |
+| `src/lib/banco.ts` | Banco gravável (`data/explorer.db`): tabelas, RLS emulado (`usuario_atual()`, views e gatilhos) e usuários mock |
+| `src/lib/acesso.ts`, `src/lib/senha.ts`, `src/lib/sessao.ts` | Login, sessões, bloqueio por tentativas, hash scrypt e `exigirUsuario()` |
+| `src/lib/regras-senha.ts` | Regras da senha nova e cálculo da força, compartilhados pelo servidor e pelo medidor |
+| `src/proxy.ts` | Redireciona para `/entrar` quem chega sem cookie de sessão |
+| `src/app/` | Páginas (Next.js App Router): `(app)/` com consulta, catálogo, tabela e relatórios; `(acesso)/` com login e nova senha |
+| `src/components/` | Editor, resultado (tabela, gráfico, plano), navegação, formulários de acesso e marca |
+| `src/components/logo.tsx`, `logo-paths.ts` | Logo oficial da ScyQuantix, copiado do `packages/ui` do ScyHome |
 
 Stack: Next.js 16, React 19, TypeScript e SQLite via `node:sqlite`. Não usa nenhuma outra dependência de execução.
 
+## Plano de deploy
+
+Nada desta seção está implementado ainda. O projeto completo está em [`docs/deploy.md`](docs/deploy.md) e o roteiro, etapa por etapa, em [`docs/mvp-passo-a-passo.md`](docs/mvp-passo-a-passo.md).
+
+**Fluxo:** Codespaces → GitHub → GitHub Actions com PySpark → Cloudflare R2 → Supabase (Postgres) → Vercel → Cloudflare DNS.
+
+| Peça | Papel |
+| --- | --- |
+| GitHub Actions + PySpark | Coleta das APIs e transformação em camadas bronze, silver e gold, com cargas agendadas |
+| Cloudflare R2 | Data lake em Parquet e arquivos CSV exportados, entregues por URL assinada |
+| Supabase | Postgres com um schema por fonte (os nomes `tce.despesas` etc. não mudam), papel só de leitura e registro anônimo das consultas para análise |
+| Vercel | O app Next.js, na região `gru1` |
+| Cloudflare DNS | Subdomínio, por exemplo `scope.scyquantix.com` |
+
+**Escopo em duas versões:**
+- **A, o MVP:** só Ferraz de Vasconcelos, toda nos planos gratuitos (US$ 0 por mês).
+- **B, depois:** o estado de São Paulo inteiro. Começa gratuita, com o detalhe só no R2 e marts agregados no Supabase. Passa a planos pagos (cerca de US$ 60 a 105 por mês) quando o uso justificar.
+
+**Roteiro da versão A:**
+
+| Etapa | O quê | Esforço |
+| --- | --- | --- |
+| 0 | Contas e serviços (GitHub, Supabase, R2, Vercel) | ½ dia |
+| 1 | Codespaces e CI | ½ dia |
+| 2 | Banco no Supabase | 1 dia |
+| 3 | Pipeline de dados | 3 a 5 dias |
+| 4 | App em Postgres (SQLite → Postgres, dialeto, plano de execução) | 3 a 5 dias |
+| 5 | Publicação na Vercel | ½ dia |
+| 6 | Domínio | 1 hora mais a propagação |
+| 7 | Operação | ½ dia |
+| 8 | Limpeza (saem `scripts/sync.mjs`, `workers/` e o `siconfi.db`) | ½ dia |
+
+**Login no deploy:** o login local **tem de ser revisto antes de publicar**. O caminho previsto é usar a autenticação do ScyHome (Supabase Auth), com `usuarios.id` (UUID) como chave e RLS nativo no Postgres. A lista do que muda está na seção 6 de [`docs/acesso.md`](docs/acesso.md).
+
+**Decisões em aberto:** login no deploy, subdomínio, ambiente de homologação, downloads públicos ou por URL assinada na versão B e o sinal de uso que justifica os planos pagos (seção 13 de [`docs/deploy.md`](docs/deploy.md)).
+
 ## Limitações do MVP
 
-- Só Ferraz de Vasconcelos. Trocar de município hoje é editar `MUNICIPIO` em `scripts/sync.mjs` e `ENTE` em `src/app/anexos/page.tsx`.
+- Só Ferraz de Vasconcelos. Trocar de município hoje é editar `MUNICIPIO` em `scripts/sync.mjs` e `ENTE` em `src/app/(app)/anexos/page.tsx`.
 - O IBGE não tem estimativa de população para 2023. Em 2022 vale o Censo.
 - Setembro e outubro de 2026 ainda vêm vazios na API do TCE-SP.
+- O login é local e serve só para rodar em `127.0.0.1`. Antes de publicar, ele precisa ser revisto (seção 6 de [`docs/acesso.md`](docs/acesso.md)).
 - Nomes sem esquema (`FROM linhas`) continuam funcionando, porque o SQLite procura nas fontes. Os exemplos usam sempre o nome qualificado.
 
 ---

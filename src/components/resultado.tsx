@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resultado as R, Valor } from "@/lib/executar";
 import { codificar } from "@/lib/sql";
 import { contagem, cru, ms, numero } from "@/lib/formato";
-import { Simbolo } from "./simbolo";
+import { LogoSimbolo } from "./logo";
 
 type Aba = "tabela" | "grafico" | "plano";
 const LOTE = 500;
@@ -81,7 +81,7 @@ export function Resultado({ resultado, sql, pendente }: { resultado: R | null; s
       </div>
 
       <div className="resultado-corpo">
-        {!resultado && !pendente && <div className="vazio vazio-marca"><Simbolo /><strong>Nenhuma consulta executada</strong><span>Escreva um SELECT e tecle Ctrl+Enter, ou escolha um exemplo à esquerda.</span><span className="assinatura">Tecnologia orientada por evidências</span></div>}
+        {!resultado && !pendente && <div className="vazio vazio-marca"><LogoSimbolo aria-hidden /><strong>Nenhuma consulta executada</strong><span>Escreva um SELECT e tecle Ctrl+Enter, ou escolha um exemplo à esquerda.</span><span className="assinatura">Tecnologia orientada por evidências</span></div>}
         {resultado && !resultado.ok && <div className="erro">{resultado.erro}</div>}
         {resultado?.ok && resultado.cortado && <div className="aviso">Mostrando as primeiras {contagem(resultado.linhas.length)} linhas. O CSV traz o resultado completo, até 200 mil linhas.</div>}
 

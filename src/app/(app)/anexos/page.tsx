@@ -3,6 +3,7 @@ import Link from "next/link";
 import { dados } from "@/lib/esquema";
 import { codificar, literal } from "@/lib/sql";
 import { contagem } from "@/lib/formato";
+import { exigirUsuario } from "@/lib/sessao";
 import { FormAuto } from "@/components/form-auto";
 
 export const metadata: Metadata = { title: "Relatórios" };
@@ -16,6 +17,7 @@ const nf = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFra
 
 /** Remonta um anexo do SICONFI como a matriz do relatório: contas nas linhas, colunas na ordem da API. */
 export default async function Anexos({ searchParams }: Props) {
+  await exigirUsuario();
   const sp = await searchParams;
   const db = dados();
   const lista = <T,>(sql: string, ...a: (string | number)[]) => (db.prepare(sql).all(...a) as Record<string, T>[]).map((r) => Object.values(r)[0] as T);

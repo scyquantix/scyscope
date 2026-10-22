@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import { fontesDisponiveis, LIMITE_EXPORTACAO } from "@/lib/config";
+import { usuarioAtual } from "@/lib/sessao";
 import { contarInstrucoes, decodificar } from "@/lib/sql";
 import { autorizar } from "../../../../workers/autorizador.mjs";
 import { conectar } from "../../../../workers/anexar.mjs";
@@ -12,7 +13,9 @@ const csv = (v: unknown) => {
 };
 
 /** CSV completo do resultado (até 200 mil linhas), gerado em fluxo para não montar tudo na memória. */
-export function GET(req: Request) {
+export async function GET(req: Request) {
+  const u = await usuarioAtual();
+  if (!u || u.trocarSenha) return new Response("Sessão necessária.", { status: 401 });
   const sql = decodificar(new URL(req.url).searchParams.get("q") ?? "")?.trim().replace(/;\s*$/, "");
   if (!sql) return new Response("Consulta ausente.", { status: 400 });
   if (contarInstrucoes(sql) > 1) return new Response("Uma instrução por vez.", { status: 400 });

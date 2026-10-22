@@ -381,3 +381,129 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .matriz .cod { display: block; font-family: var(--font-mono), monospace; font-size: 0.625rem; color: var(--faint); }
 .matriz td.vazia { color: var(--faint); }
 .matriz td.negativo { color: var(--erro); }
+
+/* ---------- Usuário no trilho ---------- */
+
+.usuario { display: flex; align-items: center; gap: 0.55rem; padding: 0.6rem 0.35rem 0; border-top: 1px solid var(--linha); min-width: 0; }
+.usuario-avatar { width: 1.85rem; height: 1.85rem; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--acento-fundo); color: var(--acento-texto); font-family: var(--font-display), sans-serif; font-size: 0.6875rem; font-weight: 700; }
+.usuario-txt { flex: 1; display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.usuario-nome { font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.usuario-login { font-size: 0.625rem; color: var(--faint); }
+@media (max-width: 72rem) {
+  .usuario { flex-direction: column; padding: 0.6rem 0 0; }
+  .usuario-txt { display: none; }
+}
+@media (max-width: 56rem) {
+  .usuario { flex-direction: row; padding: 0; border-top: 0; }
+  .usuario-avatar { display: none; }
+}
+
+/* ---------- Logo oficial ScyQuantix (components/logo.tsx) ---------- */
+
+/* Medidas do <Logo withTagline> do site: o tamanho acompanha o font-size */
+.logo { display: inline-flex; align-items: center; gap: 0.55em; font-size: 1.125rem; }
+.logo-simbolo { height: 2.3em; width: auto; flex: none; }
+.logo-txt { display: flex; flex-direction: column; }
+.logo-nome { height: 1.15em; width: auto; }
+.logo-assinatura { margin-top: 0.35em; font-family: var(--font-inter), sans-serif; font-size: 0.24em; line-height: 1; font-weight: 500; letter-spacing: 0.2em; white-space: nowrap; text-transform: uppercase; color: #5b6b7d; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Telas de acesso ---------- */
+
+/* Paleta da marca fixa, como no site: a tela de login é a mesma nos temas claro e escuro */
+.acesso {
+  color-scheme: light;
+  --painel: #ffffff; --bg: #f4f7fa; --linha: #e5eaf0; --linha-forte: #bccad8;
+  --fg: #0b2d4a; --muted: #5b6b7d; --faint: #7d8fa2;
+  --acento: #00c2d4; --acento-texto: #00788a; --acento-fundo: rgb(0 194 212 / 0.14);
+  --erro: #c2382f; --erro-fundo: rgb(194 56 47 / 0.08);
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  min-height: 100dvh; background: var(--painel); color: var(--fg);
+}
+/* Cabeçalho do site: branco, com o logo e a assinatura */
+.acesso-topo { grid-column: 1 / -1; display: flex; align-items: center; height: 5rem; padding-inline: clamp(16px, 4vw, 3.5rem); background: #fff; border-bottom: 1px solid #e5eaf0; }
+.acesso-topo a { display: inline-flex; text-decoration: none; }
+
+/* Topo da landing: degradê azul profundo, grade técnica e brilho ciano */
+.vitrine {
+  position: relative; isolation: isolate; overflow: hidden; color: #fff;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2.5rem; padding: clamp(1.5rem, 4vw, 3.5rem);
+  background: linear-gradient(to bottom right, #041322, #08243c, #0b2d4a);
+}
+.vitrine::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.07;
+  background-image: linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 75%);
+  mask: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 75%);
+}
+.vitrine::after { content: ""; position: absolute; z-index: -1; top: -10rem; right: -10%; width: 36rem; height: 36rem; border-radius: 50%; background: rgb(0 194 212 / 0.1); filter: blur(64px); }
+/* O símbolo com o halo ciano, como ao lado do título na landing */
+.vitrine-simbolo { position: absolute; z-index: -1; top: clamp(1.5rem, 5vw, 3.5rem); right: clamp(1.5rem, 5vw, 3.5rem); width: min(15rem, 32%); }
+.vitrine-simbolo::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: rgb(0 194 212 / 0.2); filter: blur(48px); }
+.vitrine-simbolo svg { position: relative; display: block; width: 100%; height: auto; filter: drop-shadow(0 20px 50px rgb(0 194 212 / 0.25)); }
+.vitrine-texto { max-width: 34rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.vitrine .sobretitulo { color: #d6e3ef; margin: 0; }
+.vitrine h1 { font-size: clamp(2rem, 3.6vw, 3.25rem); line-height: 1.08; font-weight: 700; letter-spacing: -0.02em; }
+.vitrine h1 em { display: block; color: #00c2d4; }
+.vitrine-texto > p:last-child { color: #d6e3ef; font-size: 1rem; max-width: 30rem; }
+.vitrine-lema { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; font-weight: 600; color: #5fdbe6; }
+.vitrine-lema::before { content: ""; width: 2rem; height: 2px; background: #00c2d4; flex: none; }
+
+.acesso-painel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; padding: 3rem max(16px, 2rem) 2rem; }
+.acesso-cartao { width: min(100%, 24rem); display: flex; flex-direction: column; gap: 1.5rem; }
+/* Título do card do produto no site: lupa ciano e "Scy Scope" com "Scope" em ciano */
+.produto { display: flex; align-items: center; gap: 0.75rem; font-family: var(--font-display), sans-serif; font-size: 1.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; color: #0b2d4a; }
+.produto svg { width: 1.75rem; height: 1.75rem; color: #00c2d4; flex: none; }
+.produto em { font-style: normal; color: #00c2d4; }
+.acesso-cartao h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
+.acesso-form { display: flex; flex-direction: column; gap: 1rem; }
+.rotulo { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+.campo-acesso { height: 2.75rem; padding: 0 0.85rem; border-radius: 6px; border: 1px solid var(--linha-forte); background: var(--bg); font-size: 0.9375rem; font-weight: 400; color: var(--fg); }
+.campo-acesso:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px var(--acento-fundo); }
+/* Senha com o olho dentro da caixa, à direita */
+.campo-senha { position: relative; display: flex; }
+.campo-senha .campo-acesso { flex: 1; min-width: 0; padding-right: 2.9rem; }
+.olho { position: absolute; top: 50%; right: 0.35rem; transform: translateY(-50%); width: 2.2rem; height: 2.2rem; display: grid; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--faint); cursor: pointer; }
+.olho:hover, .olho[aria-pressed="true"] { color: var(--fg); }
+.olho svg { width: 1.15rem; height: 1.15rem; }
+/* Esconde o olho nativo do Edge para não aparecerem dois */
+.campo-senha input::-ms-reveal { display: none; }
+
+/* Medidor de força: quatro barras que acendem na cor do nível */
+.medidor { display: flex; flex-direction: column; gap: 0.35rem; margin-top: -0.5rem; --cor: var(--linha-forte); }
+/* Incompatível (0) acende nenhuma barra; o rótulo fica em vermelho com o motivo da recusa */
+.medidor[data-nivel="0"] { --cor: #c2382f; }
+.medidor[data-nivel="1"] { --cor: #d4621f; }
+.medidor[data-nivel="2"] { --cor: #c98a1e; }
+.medidor[data-nivel="3"] { --cor: #00a3b2; }
+.medidor[data-nivel="4"] { --cor: #157f5b; }
+.medidor-barras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; }
+.medidor-barras i { height: 0.3rem; border-radius: 999px; background: var(--linha); transition: background-color 0.2s; }
+.medidor-barras i[data-ativa="true"] { background: var(--cor); }
+.medidor-rotulo { font-size: 0.75rem; color: var(--faint); }
+.medidor-rotulo b { color: var(--cor); font-weight: 700; }
+
+/* Botão principal do site: ciano com texto em azul profundo */
+.botao-acesso { height: 2.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border: 0; border-radius: 6px; background: #00c2d4; color: #0b2d4a; font-family: var(--font-display), sans-serif; font-weight: 600; font-size: 0.9375rem; cursor: pointer; margin-top: 0.25rem; }
+.botao-acesso:hover { background: #00a3b2; }
+.botao-acesso:disabled { opacity: 0.7; cursor: progress; }
+.botao-acesso svg { width: 1rem; height: 1rem; }
+.acesso-erro { padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--erro) 40%, transparent); background: var(--erro-fundo); color: var(--erro); font-size: 0.8125rem; }
+.acesso-erro[hidden] { display: none; }
+.acesso-regras { margin: 0; padding-left: 1.1rem; font-size: 0.75rem; color: var(--faint); display: flex; flex-direction: column; gap: 0.15rem; }
+.acesso-link { all: unset; cursor: pointer; font-size: 0.8125rem; color: var(--acento-texto); }
+.acesso-link:hover { text-decoration: underline; }
+.acesso-link:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* Estreito: cabeçalho como no celular do site, vitrine numa faixa e símbolo oculto (a landing também o esconde) */
+@media (max-width: 56rem) {
+  .acesso { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .acesso-topo { height: 4rem; }
+  .logo { font-size: 1rem; }
+  .vitrine { gap: 1.25rem; padding: 1.5rem 16px 1.75rem; }
+  .vitrine-simbolo, .vitrine-texto > p:last-child, .vitrine-lema { display: none; }
+  .vitrine-texto { gap: 0.6rem; }
+  .vitrine h1 { font-size: 1.75rem; }
+  .acesso-painel { justify-content: flex-start; padding: 2rem 16px; }
+}
